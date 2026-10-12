@@ -1,0 +1,126 @@
+/* ================================================================
+   DASHBOARD THEME — Clean, Professional, Admin-style
+   Inspired by Moqups Dashboard UI
+   ================================================================ */
+
+:root {
+  /* ── Core Palette ── */
+  --color-black:        #1A1A1A;
+  --color-dark:         #2D2D2D;
+  --color-charcoal:     #3D3D3D;
+  --color-gray-700:     #4A4A4A;
+  --color-gray-600:     #666666;
+  --color-gray-500:     #888888;
+  --color-gray-400:     #AAAAAA;
+  --color-gray-300:     #CCCCCC;
+  --color-gray-200:     #E5E5E5;
+  --color-gray-100:     #F0F0F0;
+  --color-gray-50:      #F7F7F8;
+  --color-white:        #FFFFFF;
+
+  /* Accent */
+  --color-accent:       #1A1A1A;
+  --color-accent-hover: #333333;
+  --color-accent-bg:    rgba(26, 26, 26, 0.08);
+
+  /* Semantic */
+  --color-income:       #22C55E;
+  --color-income-dark:  #16A34A;
+  --color-income-bg:    rgba(34, 197, 94, 0.08);
+  --color-income-bg-s:  rgba(34, 197, 94, 0.12);
+  --color-expense:      #EF4444;
+  --color-expense-dark: #DC2626;
+  --color-expense-bg:   rgba(239, 68, 68, 0.08);
+  --color-expense-bg-s: rgba(239, 68, 68, 0.12);
+  --color-blue:         #3B82F6;
+  --color-blue-bg:      rgba(59, 130, 246, 0.08);
+  --color-orange:       #F59E0B;
+
+  /* Sidebar */
+  --sidebar-bg:         #1A1A1A;
+  --sidebar-text:       #AAAAAA;
+  --sidebar-text-hover: #FFFFFF;
+  --sidebar-active-bg:  #333333;
+  --sidebar-width:      240px;
+  --sidebar-collapsed:  68px;
+
+  /* Content */
+  --content-bg:         #F7F7F8;
+  --card-bg:            #FFFFFF;
+  --card-border:        #E5E5E5;
+
+  /* Text */
+  --text-primary:       #1A1A1A;
+  --text-secondary:     #666666;
+  --text-tertiary:      #999999;
+  --text-on-dark:       #FFFFFF;
+  --text-on-dark-dim:   #AAAAAA;
+
+  /* Shadows */
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card:  0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:    0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg:    0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-toast: 0 8px 30px rgba(0, 0, 0, 0.15);
+
+  /* Borders */
+  --border:       #E5E5E5;
+  --border-light: #F0F0F0;
+  --border-input: #D1D5DB;
+  --border-focus: #1A1A1A;
+
+  /* Radii */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 100px;
+
+  /* Motion */
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:     0.15s;
+  --dur-normal:   0.25s;
+  --dur-slow:     0.35s;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-16px) scale(0.94); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
