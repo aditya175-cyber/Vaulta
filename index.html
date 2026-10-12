@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Vaulta — Dashboard pencatatan keuangan harian. Catat pemasukan & pengeluaran dengan mudah." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Vaulta — Dashboard Keuangan</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="assets/images/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <!-- Splash -->
+  <div class="splash" id="splashScreen">
+    <img src="assets/images/splash-icon.png" alt="Vaulta" class="logo-img logo-lg" />
+    <span class="mono muted">FINANCE TERMINAL</span>
+    <div class="splash-bar"><i></i></div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <div class="app">
+
+    <!-- ═══ SIDEBAR (desktop) ═══ -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/images/android-icon-monochrome.png" alt="Vaulta" class="logo-img" />
+        <div><b>VAULTA</b><small class="mono muted">FINANCE TERMINAL</small></div>
+      </div>
+
+      <div class="nav-title mono muted">MENU</div>
+      <nav class="nav">
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span> Ringkasan</button>
+        <button class="nav-item" data-page="history"><span class="nav-icon">☰</span> Transaksi <span class="nav-badge mono" id="navBadge" hidden>0</span></button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="sync-row mono"><span>⛓ Google Sheets</span><i class="dot"></i></div>
+        <button class="btn-primary js-new" type="button">+ Entri Baru</button>
+      </div>
+    </aside>
+
+    <div class="main">
+
+      <!-- ═══ TOP BAR ═══ -->
+      <header class="topbar">
+        <div class="brand brand-mobile">
+          <img src="assets/images/android-icon-monochrome.png" alt="Vaulta" class="logo-img" />
+          <div><b>VAULTA</b><small class="mono muted">FINANCE TERMINAL</small></div>
+        </div>
+
+        <label class="search">
+          <span aria-hidden="true">⌕</span>
+          <input type="search" id="searchInput" placeholder="Cari transaksi, kategori, atau nominal..." aria-label="Cari transaksi" />
+        </label>
+
+        <div class="topbar-right">
+          <span class="status mono muted">STATUS<br /><b id="netStatus">ONLINE</b></span>
+          <button class="btn-ghost" id="btnExport" type="button">⇩ <span class="hide-sm">Ekspor CSV</span></button>
+          <div class="user">
+            <span class="avatar">U</span>
+            <span class="user-info hide-sm"><b>User</b><small class="mono muted">Pengguna</small></span>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <!-- ═══ PAGE: Ringkasan ═══ -->
+        <section class="page-section active" id="page-dashboard">
+          <div class="page-head">
+            <div>
+              <h1 id="pageTitle">Dashboard</h1>
+              <p class="muted" id="pageSubtitle">Selamat datang! Ini ringkasan keuangan Anda.</p>
+            </div>
+            <span class="chip mono" id="dateChip"></span>
+          </div>
+
+          <div class="stats">
+            <div class="panel stat">
+              <div class="stat-top"><span class="stat-ic">↗</span><div><b>Pemasukan</b><small class="mono muted">Hari ini</small></div></div>
+              <div class="stat-value" id="todayIncome">Rp 0</div>
+              <span class="chip mono">↗ sesi ini</span>
+            </div>
+            <div class="panel stat">
+              <div class="stat-top"><span class="stat-ic">↘</span><div><b>Pengeluaran</b><small class="mono muted">Hari ini</small></div></div>
+              <div class="stat-value" id="todayExpense">Rp 0</div>
+              <span class="chip mono">↘ sesi ini</span>
+            </div>
+            <div class="panel stat">
+              <div class="stat-top"><span class="stat-ic">◎</span><div><b>Saldo</b><small class="mono muted">Selisih hari ini</small></div></div>
+              <div class="stat-value" id="todayBalance">Rp 0</div>
+              <small class="mono muted">pemasukan − pengeluaran</small>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <!-- Input Cepat -->
+            <div class="panel" id="quickInput">
+              <div class="panel-head"><h2>⌨ Input Cepat</h2><span class="mono muted">ENTRI CEPAT</span></div>
+              <form id="financeForm" autocomplete="off" class="form">
+                <div class="row2">
+                  <div class="field">
+                    <label class="label mono" for="tanggal">Tanggal</label>
+                    <input type="date" id="tanggal" required />
+                  </div>
+                  <div class="field">
+                    <span class="label mono">Jenis Transaksi</span>
+                    <div class="seg" id="segmentedControl">
+                      <input type="radio" name="jenis" id="jenis-pemasukan" value="Pemasukan" checked />
+                      <label for="jenis-pemasukan">↗ Pemasukan</label>
+                      <input type="radio" name="jenis" id="jenis-pengeluaran" value="Pengeluaran" />
+                      <label for="jenis-pengeluaran">↘ Pengeluaran</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <span class="label mono">Kategori</span>
+                  <div class="pills" id="categoryPills"></div>
+                  <input type="text" id="kategori" placeholder="Atau ketik kategori lainnya…" aria-label="Kategori" />
+                </div>
+
+                <div class="field">
+                  <label class="label mono" for="jumlah">Jumlah</label>
+                  <div class="amount"><span class="mono muted">Rp</span><input type="text" id="jumlah" placeholder="0" inputmode="numeric" required /></div>
+                </div>
+
+                <div class="field">
+                  <label class="label mono" for="keterangan">Keterangan (opsional)</label>
+                  <input type="text" id="keterangan" placeholder="Tambahkan catatan…" />
+                </div>
+
+                <button type="submit" class="btn-primary" id="btnSubmit"><span id="btnText">+ Simpan Transaksi</span></button>
+              </form>
+            </div>
+
+            <!-- Transaksi Terbaru -->
+            <div class="panel">
+              <div class="panel-head"><h2>☰ Transaksi Terbaru</h2><span class="chip mono" id="historyCount">0 entri</span></div>
+              <div class="filter mono" role="group" aria-label="Filter jenis">
+                <span class="muted">LEDGER</span>
+                <div>
+                  <button type="button" data-filter="all" class="active">Semua</button>
+                  <button type="button" data-filter="Pemasukan">Masuk</button>
+                  <button type="button" data-filter="Pengeluaran">Keluar</button>
+                </div>
+              </div>
+              <ul class="history" id="historyList"></ul>
+              <button class="link mono js-history" type="button">Semua Riwayat Transaksi →</button>
+            </div>
+          </div>
+
+          <div class="grid3">
+            <div class="panel info">
+              <small class="mono muted">SYNC ENGINE</small>
+              <h3>Google Sheets Link</h3>
+              <p class="muted">Setiap transaksi yang disimpan dikirim ke spreadsheet melalui Apps Script.</p>
+              <div class="info-row mono"><span class="muted">Arah</span><b>Satu arah (kirim)</b></div>
+            </div>
+            <div class="panel info">
+              <small class="mono muted">SESI</small>
+              <h3>Catatan Sesi Ini</h3>
+              <p class="muted">Riwayat di layar disimpan di tab ini saja dan hilang saat tab ditutup. Ekspor CSV untuk menyimpannya.</p>
+              <div class="info-row mono"><span class="muted">Entri</span><b id="sessionCount">0</b></div>
+            </div>
+            <div class="panel info">
+              <small class="mono muted">DISTRIBUSI ARUS KAS</small>
+              <h3>Pemasukan vs Pengeluaran</h3>
+              <div class="info-row mono"><span class="muted">Porsi pemasukan</span><b id="flowPct">0%</b></div>
+              <div class="bar"><i id="flowBar"></i></div>
+              <div class="info-row mono"><span class="muted">Total masuk</span><b id="totalIn">Rp 0</b></div>
+              <div class="info-row mono"><span class="muted">Total keluar</span><b id="totalOut">Rp 0</b></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ PAGE: Riwayat ═══ -->
+        <section class="page-section" id="page-history">
+          <div class="page-head">
+            <div>
+              <h1>Riwayat Transaksi</h1>
+              <p class="muted">Seluruh transaksi sesi ini.</p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>☰ Semua Transaksi</h2><span class="chip mono" id="historyCountFull">0 entri</span></div>
+            <div class="filter mono" role="group" aria-label="Filter jenis">
+              <span class="muted">LEDGER</span>
+              <div>
+                <button type="button" data-filter="all" class="active">Semua</button>
+                <button type="button" data-filter="Pemasukan">Masuk</button>
+                <button type="button" data-filter="Pengeluaran">Keluar</button>
+              </div>
+            </div>
+            <ul class="history" id="historyListFull"></ul>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="bottom-nav" aria-label="Navigasi">
+    <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span>Ringkasan</button>
+    <button class="nav-item js-new" type="button"><span class="nav-icon">＋</span>Entri</button>
+    <button class="nav-item" data-page="history"><span class="nav-icon">☰</span>Transaksi</button>
+  </nav>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
