@@ -16,11 +16,13 @@
     document.getElementById('splashScreen')?.remove();
     return;
   }
+  // jaring pengaman: apa pun yang error, splash tidak boleh menutupi halaman selamanya
+  setTimeout(() => document.getElementById('splashScreen')?.classList.add('hidden'), 4000);
   for (const src of ['assets/js/app.js', 'assets/js/motion.js']) {
     await new Promise((ok, no) => {
       const s = document.createElement('script');
-      s.src = src; s.onload = ok; s.onerror = () => no(new Error(src));
+      s.src = src; s.onload = ok; s.onerror = () => no(new Error('File tidak ditemukan: ' + src));
       document.body.append(s);
-    });
+    }).catch((err) => console.error(err));
   }
 })();
