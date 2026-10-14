@@ -1,0 +1,141 @@
+<main class="page-content">
+
+  <!-- ═══ PAGE: Ringkasan ═══ -->
+  <section class="page-section active" id="page-dashboard">
+    <div class="page-head" data-reveal>
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p class="muted" id="pageSubtitle">Selamat datang! Ini ringkasan keuangan Anda.</p>
+      </div>
+      <span class="chip mono" id="dateChip"></span>
+    </div>
+
+    <div class="stats">
+      <div class="panel stat" data-reveal>
+        <div class="stat-top"><span class="stat-ic"><img class="ic" src="assets/images/icons/icon_income.svg" alt="" width="18" height="18"></span><div><b>Pemasukan</b><small class="mono muted">Hari ini</small></div></div>
+        <div class="stat-value" id="todayIncome">Rp 0</div>
+        <span class="chip mono">↗ sesi ini</span>
+      </div>
+      <div class="panel stat" data-reveal>
+        <div class="stat-top"><span class="stat-ic"><img class="ic" src="assets/images/icons/icon_production.svg" alt="" width="18" height="18"></span><div><b>Pengeluaran</b><small class="mono muted">Hari ini</small></div></div>
+        <div class="stat-value" id="todayExpense">Rp 0</div>
+        <span class="chip mono">↘ sesi ini</span>
+      </div>
+      <div class="panel stat" data-reveal>
+        <div class="stat-top"><span class="stat-ic"><img class="ic" src="assets/images/icons/icon_saldo.svg" alt="" width="18" height="18"></span><div><b>Saldo</b><small class="mono muted">Selisih hari ini</small></div></div>
+        <div class="stat-value" id="todayBalance">Rp 0</div>
+        <small class="mono muted">pemasukan − pengeluaran</small>
+        <small class="mono muted">Sisa saldo total: <b id="totalSaldo">—</b></small>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <!-- Input Cepat -->
+      <div class="panel" id="quickInput" data-reveal>
+        <div class="panel-head"><h2><img class="ic" src="assets/images/icons/icon_input.svg" alt="" width="18" height="18"> Input Cepat</h2><span class="mono muted">ENTRI CEPAT</span></div>
+        <form id="financeForm" autocomplete="off" class="form">
+          <div class="row2">
+            <div class="field">
+              <label class="label mono" for="tanggal">Tanggal</label>
+              <input type="date" id="tanggal" required />
+            </div>
+            <div class="field">
+              <span class="label mono">Jenis Transaksi</span>
+              <div class="seg" id="segmentedControl">
+                <input type="radio" name="jenis" id="jenis-pemasukan" value="Pemasukan" checked />
+                <label for="jenis-pemasukan">↗ Pemasukan</label>
+                <input type="radio" name="jenis" id="jenis-pengeluaran" value="Pengeluaran" />
+                <label for="jenis-pengeluaran">↘ Pengeluaran</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label mono">Kategori</span>
+            <div class="pills" id="categoryPills"></div>
+            <input type="text" id="kategori" placeholder="Atau ketik kategori lainnya…" aria-label="Kategori" />
+          </div>
+
+          <div class="field">
+            <label class="label mono" for="jumlah">Jumlah</label>
+            <div class="amount"><span class="mono muted">Rp</span><input type="text" id="jumlah" placeholder="0" inputmode="numeric" required /></div>
+          </div>
+
+          <div class="field">
+            <label class="label mono" for="keterangan">Keterangan (opsional)</label>
+            <input type="text" id="keterangan" placeholder="Tambahkan catatan…" />
+          </div>
+
+          <button type="submit" class="btn-primary" id="btnSubmit"><span id="btnText">+ Simpan Transaksi</span></button>
+        </form>
+      </div>
+
+      <!-- Transaksi Terbaru -->
+      <div class="panel" data-reveal>
+        <div class="panel-head"><h2><img class="ic" src="assets/images/icons/icon_transaction.svg" alt="" width="18" height="18"> Transaksi Terbaru</h2><span class="chip mono" id="historyCount">0 entri</span></div>
+        <div class="filter mono" role="group" aria-label="Filter jenis">
+          <span class="muted">LEDGER</span>
+          <div>
+            <button type="button" data-filter="all" class="active">Semua</button>
+            <button type="button" data-filter="Pemasukan">Masuk</button>
+            <button type="button" data-filter="Pengeluaran">Keluar</button>
+          </div>
+        </div>
+        <ul class="history" id="historyList"></ul>
+        <button class="link mono js-history" type="button">Semua Riwayat Transaksi →</button>
+      </div>
+    </div>
+
+    <div class="panel chart-panel" data-reveal>
+      <div class="panel-head"><h2>Grafik Arus Kas</h2><span class="mono muted">Dari Google Sheets</span></div>
+      <p class="chart-note muted" id="chartNote">Memuat grafik…</p>
+      <div class="chart-wrap"><canvas id="financeChart" role="img" aria-label="Grafik pemasukan dan pengeluaran dari Google Sheets"></canvas></div>
+    </div>
+
+    <div class="grid3">
+      <div class="panel info" data-reveal>
+        <small class="mono muted">SYNC ENGINE</small>
+        <h3><img class="ic" src="assets/images/icons/icon_googlesheet.svg" alt="" width="18" height="18"> Google Sheets Link</h3>
+        <p class="muted">Setiap transaksi yang disimpan dikirim ke spreadsheet melalui Apps Script.</p>
+        <div class="info-row mono"><span class="muted">Arah</span><b>Satu arah (kirim)</b></div>
+      </div>
+      <div class="panel info" data-reveal>
+        <small class="mono muted">SESI</small>
+        <h3>Catatan Sesi Ini</h3>
+        <p class="muted">Riwayat di layar disimpan di tab ini saja dan hilang saat tab ditutup. Ekspor CSV untuk menyimpannya.</p>
+        <div class="info-row mono"><span class="muted">Entri</span><b id="sessionCount">0</b></div>
+      </div>
+      <div class="panel info" data-reveal>
+        <small class="mono muted">DISTRIBUSI ARUS KAS</small>
+        <h3>Pemasukan vs Pengeluaran</h3>
+        <div class="info-row mono"><span class="muted">Porsi pemasukan</span><b id="flowPct">0%</b></div>
+        <div class="bar"><i id="flowBar"></i></div>
+        <div class="info-row mono"><span class="muted">Total masuk</span><b id="totalIn">Rp 0</b></div>
+        <div class="info-row mono"><span class="muted">Total keluar</span><b id="totalOut">Rp 0</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE: Riwayat ═══ -->
+  <section class="page-section" id="page-history">
+    <div class="page-head">
+      <div>
+        <h1>Riwayat Transaksi</h1>
+        <p class="muted">Seluruh transaksi sesi ini.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2><img class="ic" src="assets/images/icons/icon_transaction.svg" alt="" width="18" height="18"> Semua Transaksi</h2><span class="chip mono" id="historyCountFull">0 entri</span></div>
+      <div class="filter mono" role="group" aria-label="Filter jenis">
+        <span class="muted">LEDGER</span>
+        <div>
+          <button type="button" data-filter="all" class="active">Semua</button>
+          <button type="button" data-filter="Pemasukan">Masuk</button>
+          <button type="button" data-filter="Pengeluaran">Keluar</button>
+        </div>
+      </div>
+      <ul class="history" id="historyListFull"></ul>
+    </div>
+  </section>
+
+</main>

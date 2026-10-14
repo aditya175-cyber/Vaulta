@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Vaulta — Dashboard pencatatan keuangan harian. Catat pemasukan & pengeluaran dengan mudah." />
+  <meta name="theme-color" content="#285A48" />
+  <title>Vaulta — Dashboard Keuangan</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>document.documentElement.classList.add('motion')</script>
+  <link rel="icon" href="assets/images/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/sidebar.css" />
+  <link rel="stylesheet" href="assets/css/header.css" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/footer.css" />
+  <link rel="stylesheet" href="assets/css/motion.css" />
+</head>
+<body>
+
+  <!-- Splash -->
+  <div class="splash" id="splashScreen">
+    <img src="assets/images/splash-icon.png" alt="Vaulta" class="logo-img logo-lg" />
+ 
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <div class="app">
+
+    <div data-include="components/sidebar.html"></div>
+
+    <div class="main">
+      <div data-include="components/header.html"></div>
+      <div data-include="components/main.html"></div>
+      <div data-include="components/footer.html"></div>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="assets/js/include.js"></script>
+</body>
+</html>
