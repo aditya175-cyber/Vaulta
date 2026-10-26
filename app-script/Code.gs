@@ -2,14 +2,15 @@
  * VAULTA — Google Apps Script (web app)
  *
  * Kolom sheet:
- *   A Tanggal | B Jenis | C Kategori | D Jumlah | E Keterangan | F Saldo (sisa saldo berjalan)
+ *   A tanggal | B jenis | C kategori | D jumlah | E keterangan | F sisa saldo (saldo berjalan)
  *
  * Langkah awal : jalankan setupSheet() SEKALI dari editor Apps Script.
+ *   Ini juga memperbaiki kolom "sisa saldo" yang tadinya #ERROR!.
  * Setelah ubah kode: Deploy > Manage deployments > Edit > Version: New version > Deploy.
  *   (tanpa versi baru, web app tetap memakai kode lama)
  */
 
-var HEADERS = ['Tanggal', 'Jenis', 'Kategori', 'Jumlah', 'Keterangan', 'Saldo'];
+var HEADERS = ['tanggal', 'jenis', 'kategori', 'jumlah', 'keterangan', 'sisa saldo'];
 var CHART_DAYS = 7;                  // jumlah hari terakhir yang ditampilkan di grafik
 var RUPIAH_FORMAT = '"Rp "#,##0';
 
@@ -27,11 +28,32 @@ function safe_(v) {
   return /^[=+\-@]/.test(v) ? "'" + v : v;
 }
 
-// Saldo baris ini = saldo baris di atasnya ± jumlah (header "Saldo" dihitung 0 oleh N())
-function setSaldoFormula_(sheet, row) {
-  sheet.getRange(row, 6).setFormula(
-    '=N(F' + (row - 1) + ')+IF(B' + row + '="Pemasukan",D' + row + ',-D' + row + ')'
-  );
+/**
+ * Saldo berjalan per baris. rows = [[jenis, jumlah], ...] urut dari atas.
+ * Baris rusak (jenis/jumlah tidak valid) tidak mengubah saldo dan ditulis kosong.
+ */
+function runningSaldo_(rows) {
+  var saldo = 0;
+  return rows.map(function (r) {
+    var jumlah = Number(r[1]);
+    if ((r[0] !== 'Pemasukan' && r[0] !== 'Pengeluaran') || !isFinite(jumlah)) return [''];
+    saldo += r[0] === 'Pemasukan' ? jumlah : -jumlah;
+    return [saldo];
+  });
+}
+
+/**
+ * Isi ulang seluruh kolom F sebagai ANGKA (bukan rumus), jadi tidak bisa #ERROR!.
+ * shortcut: hitung ulang semua baris tiap simpan, cukup sampai puluhan ribu baris;
+ * di atas itu ganti dengan menghitung dari saldo baris terakhir saja.
+ */
+function recalcSaldo_(sheet) {
+  var last = sheet.getLastRow();
+  if (last < 2) return;
+  var n = last - 1;
+  var rows = sheet.getRange(2, 2, n, 3).getValues().map(function (r) { return [r[0], r[2]]; }); // B (jenis) & D (jumlah)
+  var out = sheet.getRange(2, 6, n, 1);
+  out.clearContent().setValues(runningSaldo_(rows)).setNumberFormat(RUPIAH_FORMAT);
 }
 
 function writeHeader_(sheet) {
@@ -39,18 +61,21 @@ function writeHeader_(sheet) {
   sheet.setFrozenRows(1);
 }
 
-/** Jalankan sekali: pasang header, rumus Saldo untuk data lama, dan format Rupiah. */
+/** Jalankan sekali: pasang header, format Rupiah, dan isi "sisa saldo" untuk semua data lama. */
 function setupSheet() {
   var sheet = getSheet_();
   var first = String(sheet.getRange(1, 1).getValue()).toLowerCase();
   if (sheet.getLastRow() > 0 && first !== 'tanggal') sheet.insertRowBefore(1); // data lama belum punya header
   writeHeader_(sheet);
-
-  var last = sheet.getLastRow();
-  for (var r = 2; r <= last; r++) setSaldoFormula_(sheet, r);
-
   sheet.getRange('D2:D').setNumberFormat(RUPIAH_FORMAT);
-  sheet.getRange('F2:F').setNumberFormat(RUPIAH_FORMAT);
+  recalcSaldo_(sheet);
+}
+
+/** Cek cepat tanpa Sheets: jalankan dari editor, error jika hitungan salah. */
+function selfTest() {
+  var r = runningSaldo_([['Pemasukan', 100], ['Pengeluaran', 30], ['x', 5], ['Pengeluaran', 'abc'], ['Pengeluaran', 80]]);
+  if (JSON.stringify(r) !== '[[100],[70],[""],[""],[-10]]') throw new Error('runningSaldo_ salah: ' + JSON.stringify(r));
+  Logger.log('OK');
 }
 
 function doPost(e) {
@@ -78,7 +103,7 @@ function doPost(e) {
     if (sheet.getLastRow() === 0) writeHeader_(sheet); // sheet kosong → buat header dulu
 
     sheet.appendRow([tanggal, jenis, safe_(data.kategori), jumlah, data.keterangan ? safe_(data.keterangan) : '-']);
-    setSaldoFormula_(sheet, sheet.getLastRow());
+    recalcSaldo_(sheet);
 
     return json_({ result: 'success' });
 
