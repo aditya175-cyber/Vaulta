@@ -1,70 +1,79 @@
-/* BASE — token warna & motion, reset, brand, splash, layout dasar, tombol, ikon */
+/* BASE — token (60/40/… → 20% putih · 40% hitam · 40% kuning), reset, brand, splash, tombol, ikon */
 :root {
-  --mint: #B0E4CC;      /* background & card */
-  --sage: #408A71;      /* outline card */
-  --forest: #285A48;    /* header, navbar, footer */
-  --ink: #091413;       /* teks & elemen utama */
-  --muted: #285A48;     /* teks redup di atas mint (5.5:1) */
-  --muted-dark: #A6DBC1;/* teks redup di atas forest (5.1:1) */
-  --line: rgba(64, 138, 113, 0.4);
+  --yellow: #FFD60A;
+  --black: #0E0E10;
+  --white: #FFFFFF;
 
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --r: 8px;
+  --ink: #0E0E10;                       /* teks di atas kuning/putih */
+  --muted: rgba(14, 14, 16, 0.66);      /* teks redup di atas kuning (≥6:1) */
+  --muted-white: #6B6B70;               /* teks redup di atas putih (5:1) */
+  --muted-dark: rgba(255, 255, 255, 0.62); /* teks redup di atas hitam */
+  --line: rgba(14, 14, 16, 0.14);
+  --line-dark: rgba(255, 255, 255, 0.12);
 
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);     /* easing utama */
-  --spring: cubic-bezier(0.34, 1.3, 0.64, 1); /* overshoot ringan untuk indikator */
-  --t-fast: 150ms;
-  --t: 250ms;
-  --t-slow: 400ms;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --r: 22px;
+  --r-sm: 14px;
+
+  /* Easing ala Apple: masuk cepat, berhenti lembut. Tanpa overshoot. */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-fast: 220ms;
+  --t: 420ms;
+  --t-slow: 800ms;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--mint); color: var(--ink); font: 1rem/1.6 var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; }
+body { background: var(--yellow); color: var(--ink); font: 1rem/1.55 var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; letter-spacing: -0.011em; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
+.sidebar :focus-visible, .topbar :focus-visible, .bottom-nav :focus-visible, .stat :focus-visible, .chart-panel :focus-visible { outline-color: var(--yellow); }
 
-.mono { font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
+.mono { font-size: 0.78rem; font-weight: 500; letter-spacing: 0; }
 .muted { color: var(--muted); }
-small { font-size: 0.75rem; display: block; }
+small { font-size: 0.78rem; display: block; }
 
 /* ── Brand ── */
 .logo-img { width: 34px; height: 34px; object-fit: contain; flex: none; }
-.logo-lg { width: 120px; height: 120px; }
+.logo-lg { width: 96px; height: 96px; }
 .brand { display: flex; align-items: center; gap: 10px; }
-.brand b { letter-spacing: 0.08em; font-size: 0.95rem; display: block; line-height: 1.1; }
-.brand small { font-size: 0.65rem; }
+.brand b { letter-spacing: -0.01em; font-size: 1.05rem; font-weight: 600; display: block; line-height: 1.1; }
+.brand small { font-size: 0.7rem; }
 .brand-mobile { display: none; }
 
-/* ── Splash (hitam polos) ── */
-.splash { position: fixed; inset: 0; z-index: 1000; background: #285A48; color: var(--mint); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: opacity 0.5s, visibility 0.5s; }
+/* ── Splash ── */
+.splash { position: fixed; inset: 0; z-index: 1000; background: var(--black); color: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.8s var(--ease-io), visibility 0.8s; }
+.splash .logo-img { animation: breathe 2s var(--ease-io) infinite alternate; }
 .splash .muted { color: var(--muted-dark); }
 .splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.splash-bar { width: 140px; height: 2px; background: rgba(176, 228, 204, 0.2); margin-top: 18px; overflow: hidden; }
-.splash-bar i { display: block; height: 100%; background: var(--mint); animation: load 2s ease-in-out forwards; }
+.splash-bar { width: 120px; height: 3px; border-radius: 3px; background: var(--line-dark); margin-top: 18px; overflow: hidden; }
+.splash-bar i { display: block; height: 100%; border-radius: 3px; background: var(--yellow); animation: load 2s var(--ease-io) forwards; }
 @keyframes load { from { width: 0; } to { width: 100%; } }
+@keyframes breathe { from { opacity: 0.75; scale: 0.97; } to { opacity: 1; scale: 1; } }
 
 /* ── Layout ── */
 .app { display: flex; min-height: 100vh; }
 .main { flex: 1; min-width: 0; }
+
 /* ── Buttons ── */
-.btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 20px; background: var(--forest); color: var(--mint); border: 1px solid var(--sage); border-radius: 6px; font-weight: 500;
-  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), scale var(--t-fast) var(--ease), translate var(--t) var(--ease); }
-.btn-primary:hover { background: var(--sage); color: var(--ink); }
-.btn-ghost { display: inline-flex; gap: 6px; align-items: center; padding: 7px 14px; border: 1px solid rgba(176, 228, 204, 0.4); border-radius: 6px; font-size: 0.85rem;
+.btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: var(--black); color: var(--yellow); border-radius: 9999px; font-weight: 600;
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), scale var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease); }
+.btn-primary:hover { background: #2a2a2e; }
+.btn-ghost { display: inline-flex; gap: 6px; align-items: center; padding: 8px 16px; border: 1px solid var(--line-dark); border-radius: 9999px; font-size: 0.85rem; color: var(--white);
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), scale var(--t-fast) var(--ease); }
-.btn-ghost:hover { background: var(--sage); border-color: var(--sage); color: var(--ink); }
-.btn-primary:active, .btn-ghost:active, .pill:active { scale: 0.98; transition-duration: 80ms; }
+.btn-ghost:hover { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+.btn-primary:active, .btn-ghost:active, .pill:active { scale: 0.97; transition-duration: 100ms; }
 .btn-primary:disabled { opacity: 0.6; cursor: wait; }
 #btnText { display: inline-flex; align-items: center; gap: 8px; }
-.spinner { width: 14px; height: 14px; border: 2px solid rgba(176, 228, 204, 0.35); border-top-color: var(--mint); border-radius: 50%; animation: spin 0.7s linear infinite; }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(255, 214, 10, 0.3); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Icon gambar (SVG) ──
-   Disamakan jadi siluet satu warna: gelap di atas mint, putih di atas forest. */
-.ic { width: 1.15em; height: 1.15em; vertical-align: -0.2em; flex: none; object-fit: contain; filter: brightness(0); }
-.sidebar .nav-item:not(.active) .ic, .sidebar .sync-row .ic, .bottom-nav .ic { filter: brightness(0) invert(1); }
+/* ── Ikon SVG: siluet satu warna. Default gelap; putih jika di atas hitam. ── */
+.ic { width: 1.15em; height: 1.15em; vertical-align: -0.2em; flex: none; object-fit: contain; filter: brightness(0); transition: filter var(--t-fast) var(--ease); }
+.sidebar .nav-item:not(.active) .ic, .sidebar .sync-row .ic, .bottom-nav .ic, .panel-dark .panel-head .ic { filter: brightness(0) invert(1); }
 .stat-ic .ic, .hi-icon .ic { width: 18px; height: 18px; vertical-align: 0; }
 .sync-name { display: inline-flex; align-items: center; gap: 8px; }
 .nav-item .ic { width: 18px; height: 18px; vertical-align: 0; }
