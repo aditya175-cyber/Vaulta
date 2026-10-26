@@ -6,7 +6,7 @@
  * Endpoint URL Google Apps Script.
  * Ganti URL ini dengan endpoint Apps Script milik Anda.
  */
-const SCRIPT_URL ='https://script.google.com/macros/s/AKfycbzmTwFnDX7lyfj6hnmD9rLxg2vzpVF2ShSJvVILYGq9dTM6R3Q6ByYC3JcXgFjEdm60ZQ/exec';
+const SCRIPT_URL ='https://script.google.com/macros/s/AKfycbzBij6QiybtWYY-UGbPB69QoGigPvXfXPlZcye7fVSJSybNUI_nAJkzg-BnoBnyCe7AwQ/exec';
 
 /**
  * Mengirim data transaksi ke Google Apps Script.
