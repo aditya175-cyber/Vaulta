@@ -1,41 +1,28 @@
 /* =============================================================
-   API.JS — Fungsi pengiriman data (Fetch) ke Google Apps Script
+   API.JS — Semua komunikasi ke Google Apps Script (wajib login)
    ============================================================= */
 
-/**
- * Endpoint URL Google Apps Script.
- * Ganti URL ini dengan endpoint Apps Script milik Anda.
- */
+/** Endpoint URL Google Apps Script (deployment web app). */
 const SCRIPT_URL ='https://script.google.com/macros/s/AKfycbyKJ3oAvmTa5fJzDiWGPgPujG6Q31tiILE2EixgnUtnMAWOn4FTAMVQAmuayXI-KxQu_Q/exec';
 
-/**
- * Mengirim data transaksi ke Google Apps Script.
- *
- * Menggunakan mode `no-cors` karena Apps Script tidak mengizinkan
- * CORS dari origin file:// / localhost.  Response bersifat opaque
- * sehingga kita tidak bisa membaca body — kita anggap sukses
- * selama tidak ada network error (throw).
- *
- * @param {Object} payload
- * @param {string} payload.tanggal  – Format YYYY-MM-DD
- * @param {string} payload.jenis    – "Pemasukan" | "Pengeluaran"
- * @param {string} payload.kategori – Nama kategori
- * @param {number} payload.jumlah   – Nominal (integer)
- * @param {string} payload.keterangan – Catatan opsional
- * @returns {Promise<void>}
- */
-async function submitTransaction(payload) {
-  const response = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+const TOKEN_KEY = 'vaulta_token';
 
-  // `no-cors` → opaque response (status 0, body null)
-  // Jika fetch tidak throw, kita anggap berhasil.
-  return response;
+/**
+ * Kirim aksi ke Apps Script lewat POST text/plain (tanpa preflight CORS, balasan bisa dibaca).
+ * Aksi: login | logout | add | data. Token disisipkan otomatis.
+ * Jika token ditolak server → event "vaulta:logout" agar app.js menampilkan halaman login.
+ */
+async function api(action, data = {}) {
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ ...data, action, token: localStorage.getItem(TOKEN_KEY) || '' }),
+  });
+  const out = await res.json();
+  if (out.error === 'auth') document.dispatchEvent(new Event('vaulta:logout'));
+  if (out.error) throw new Error(out.error);
+  return out;
 }
 
-// Expose ke global scope agar bisa dipakai dari app.js
-window.submitTransaction = submitTransaction;
+window.api = api;
+window.submitTransaction = (payload) => api('add', payload);
