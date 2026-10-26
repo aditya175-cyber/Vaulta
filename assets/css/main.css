@@ -119,3 +119,16 @@ input::placeholder { color: #86868B; }
   .hi-date { display: none; }
   .history-item { grid-template-columns: 38px 1fr auto; }
 }
+
+/* ── Login ── */
+.login { position: fixed; inset: 0; z-index: 950; display: grid; place-items: center; padding: 20px; background: var(--yellow); animation: fade var(--t-slow) var(--ease); }
+.login-card { display: grid; gap: 8px; width: min(380px, 100%); padding: 32px; background: var(--black); color: var(--white); border-radius: var(--r); }
+.login-card .logo-img { width: 56px; height: 56px; margin-bottom: 8px; }
+.login-card h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; }
+.login-card .muted { color: var(--muted-dark); margin-bottom: 8px; font-size: 0.9rem; }
+.login-card .label { color: var(--muted-dark); margin-top: 6px; }
+.login-card input { width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.1); color: var(--white); border: 1.5px solid transparent; border-radius: var(--r-sm); outline: 0; transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease); }
+.login-card input:focus { border-color: var(--yellow); background: rgba(255, 255, 255, 0.14); }
+.login-card .btn-primary { background: var(--yellow); color: var(--black); margin-top: 14px; }
+.login-card .btn-primary:hover { background: #ffe14d; }
+.login-error { color: var(--yellow); font-size: 0.85rem; font-weight: 500; }
