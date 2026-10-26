@@ -29,7 +29,7 @@
   addEventListener('resize', syncNav);
   if (document.fonts) document.fonts.ready.then(placeIndicators); // lebar teks berubah setelah font termuat
 
-  /* ── 2. Header: elevasi + mengecil saat scroll ── */
+  /* ── 2. Header: bayangan saat scroll ── */
   const topbar = document.querySelector('.topbar');
   let ticking = false;
   addEventListener('scroll', () => {
@@ -42,8 +42,8 @@
   }, { passive: true });
 
   /* ── 3. Scroll reveal (stagger per kelompok yang muncul bersamaan) ── */
-  const STAGGER = 60;   // ms, standard cascade
-  const MAX_STEPS = 5;  // total delay ≤ 300ms
+  const STAGGER = 80;   // ms, cascade lembut
+  const MAX_STEPS = 5;  // total delay ≤ 400ms
   let revealStarted = false;
 
   function startReveal() {
@@ -67,29 +67,4 @@
   // mulai setelah splash tertutup (app.js memicu event ini); fallback jika terlewat
   document.addEventListener('vaulta:ready', startReveal, { once: true });
   setTimeout(startReveal, 3000);
-
-  /* ── 4. Magnetic button (hanya mouse/trackpad) ── */
-  if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    const RADIUS = 80;   // px dari tepi tombol
-    const PULL = 0.25;   // seberapa kuat tarikan
-    const MAX = 6;       // px
-    const buttons = [...$$('.btn-primary')];
-    const clamp = (v) => Math.max(-MAX, Math.min(MAX, v));
-    let frame = 0;
-
-    addEventListener('pointermove', (e) => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        buttons.forEach((b) => {
-          const r = b.getBoundingClientRect();
-          if (!r.width) return; // tersembunyi (mis. sidebar di mobile)
-          const dx = e.clientX - (r.left + r.width / 2);
-          const dy = e.clientY - (r.top + r.height / 2);
-          const near = Math.abs(dx) < r.width / 2 + RADIUS && Math.abs(dy) < r.height / 2 + RADIUS;
-          b.style.translate = near ? `${clamp(dx * PULL)}px ${clamp(dy * PULL)}px` : '';
-        });
-      });
-    }, { passive: true });
-  }
 })();
