@@ -53,7 +53,11 @@
       currentJenis = r.value;
       renderPills();
     }));
-    searchInput.addEventListener('input', renderHistory);
+    searchInput.addEventListener('input', () => {
+      // daftar di dashboard hanya 5 baris → pindah ke halaman riwayat agar hasil pencarian terlihat
+      if (searchInput.value.trim() && $('#page-dashboard').classList.contains('active')) navigateTo('history');
+      renderHistory();
+    });
     $('#btnExport').addEventListener('click', exportCsv);
     form.addEventListener('submit', (e) => { e.preventDefault(); submitForm(); });
     bindAmountInput(inputJumlah);
@@ -64,12 +68,68 @@
     setNet();
 
     renderPills();
-    loadSession();
-    loadChart();
+    bindAuth();
+    if (localStorage.getItem('vaulta_token')) { setUser(); loadSession(); loadChart(); } else showLogin();
     setTimeout(() => {
       $('#splashScreen').classList.add('hidden'); // selaras durasi loader
       document.dispatchEvent(new Event('vaulta:ready')); // memulai scroll reveal (motion.js)
     }, 2000);
+  }
+
+  /* ── Login / akun ── */
+  function showLogin() {
+    $('#loginScreen').hidden = false;
+    $('#loginUser').focus();
+  }
+
+  function setUser() {
+    const name = localStorage.getItem('vaulta_user') || 'User';
+    $('#userName').textContent = name;
+    $('#userAvatar').textContent = name.charAt(0).toUpperCase();
+  }
+
+  function logout() {
+    window.api('logout').catch(() => {}); // token dibuang di sisi browser apa pun hasilnya
+    localStorage.removeItem('vaulta_token');
+    localStorage.removeItem('vaulta_user');
+    sessionStorage.removeItem('vaulta_session'); // jangan sisakan data akun sebelumnya
+    entries = [];
+    searchInput.value = '';
+    updateSummary();
+    renderHistory();
+    showLogin();
+  }
+
+  function bindAuth() {
+    $('#btnLogout').addEventListener('click', logout);
+    document.addEventListener('vaulta:logout', () => {
+      localStorage.removeItem('vaulta_token');
+      showLogin();
+    });
+    $('#loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('#loginBtn');
+      const err = $('#loginError');
+      err.hidden = true;
+      btn.disabled = true;
+      btn.textContent = 'Memeriksa…';
+      try {
+        const out = await window.api('login', { username: $('#loginUser').value, password: $('#loginPass').value });
+        localStorage.setItem('vaulta_token', out.token);
+        localStorage.setItem('vaulta_user', out.username);
+        $('#loginPass').value = '';
+        $('#loginScreen').hidden = true;
+        setUser();
+        loadSession();
+        loadChart();
+      } catch (ex) {
+        err.textContent = ex.message === 'Failed to fetch' ? 'Tidak bisa terhubung ke server.' : ex.message;
+        err.hidden = false;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+      }
+    });
   }
 
   /* ── Navigasi ── */
@@ -142,10 +202,10 @@
       renderPills(); // juga mengosongkan kategori
       inputJumlah.value = '';
       inputKeterangan.value = '';
-      loadChart(); // sinkronkan grafik dengan Sheets
+      setTimeout(loadChart, 1500); // beri waktu Apps Script menulis baris baru
     } catch (err) {
       renderHistory(); // buang skeleton
-      showToast('error', 'Gagal!', 'Tidak dapat mengirim data. Periksa koneksi Anda.');
+      showToast('error', 'Gagal!', err.message === 'auth' ? 'Sesi berakhir, silakan masuk lagi.' : 'Tidak dapat menyimpan data. Periksa koneksi Anda.');
       console.error('Submit error:', err);
     } finally {
       setLoading(false);
@@ -171,12 +231,8 @@
     const note = $('#chartNote');
     const showNote = (msg) => { if (!financeChart) { note.hidden = false; note.textContent = msg; } };
 
-    if (typeof Chart === 'undefined') { showNote('Library grafik gagal dimuat. Periksa koneksi internet.'); return; }
-
     try {
-      const res = await fetch(SCRIPT_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const data = await window.api('data');
       const c = data && data.chart;
       if (!c || !Array.isArray(c.labels) || !Array.isArray(c.pemasukan) || !Array.isArray(c.pengeluaran)) {
         throw new Error('Format data grafik tidak sesuai');
@@ -186,6 +242,15 @@
       const saldo = Number(data.summary && data.summary.saldo);
       if (Number.isFinite(saldo)) $('#totalSaldo').textContent = (saldo < 0 ? '- ' : '') + formatRupiah(Math.abs(Math.round(saldo)));
       note.hidden = true;
+
+      // Riwayat dari Sheets → tabel & pencarian mencakup semua data, bukan hanya sesi tab ini
+      if (Array.isArray(data.rows)) {
+        entries = data.rows;
+        updateSummary();
+        renderHistory();
+      }
+
+      if (typeof Chart === 'undefined') { showNote('Library grafik gagal dimuat. Periksa koneksi internet.'); return; } // saldo & riwayat tetap tampil
 
       // Chart.js error jika canvas dipakai dua kali → perbarui data saja
       if (financeChart) {
@@ -314,8 +379,9 @@
   function renderInto(listEl, countEl, list, limit) {
     countEl.textContent = `${list.length} entri`;
     if (list.length === 0) {
+      const searching = searchInput.value.trim() || filter !== 'all';
       listEl.innerHTML = `<li class="empty"><span class="empty-ic">▤</span>
-        <b>Belum ada transaksi tercatat</b>Catat transaksi pertama melalui formulir Input Cepat.</li>`;
+        <b>${searching ? 'Tidak ada hasil' : 'Belum ada transaksi tercatat'}</b>${searching ? 'Coba kata kunci atau filter lain.' : 'Catat transaksi pertama melalui formulir Input Cepat.'}</li>`;
       return;
     }
     listEl.innerHTML = (limit ? list.slice(0, limit) : list).map((e) => {
