@@ -2,7 +2,7 @@
 <header class="topbar">
   <div class="brand brand-mobile">
     <img src="assets/images/android-icon-monochrome.png" alt="Vaulta" class="logo-img" />
-    <div><b>VAULTA</b><small class="mono muted">Financial Record</small></div>
+    <div><b>Vaulta</b><small class="mono muted">Financial Record</small></div>
   </div>
 
   <label class="search">
@@ -11,11 +11,12 @@
   </label>
 
   <div class="topbar-right">
-    <span class="status mono muted">STATUS<br /><b id="netStatus">ONLINE</b></span>
+    <span class="status mono muted">Status<br /><b id="netStatus">Online</b></span>
     <button class="btn-ghost" id="btnExport" type="button">⇩ <span class="hide-sm">Ekspor CSV</span></button>
     <div class="user">
-      <span class="avatar">U</span>
-      <span class="user-info hide-sm"><b>User</b><small class="mono muted">Pengguna</small></span>
+      <span class="avatar" id="userAvatar">U</span>
+      <span class="user-info hide-sm"><b id="userName">User</b><small class="mono muted">Pengguna</small></span>
     </div>
+    <button class="btn-ghost" id="btnLogout" type="button">Keluar</button>
   </div>
 </header>
