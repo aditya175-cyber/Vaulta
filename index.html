@@ -29,6 +29,21 @@
     <div class="splash-bar"><i></i></div>
   </div>
 
+  <!-- Login -->
+  <div class="login" id="loginScreen" hidden>
+    <form class="login-card" id="loginForm" autocomplete="on">
+      <img src="assets/images/splash-icon.png" alt="Vaulta" class="logo-img" />
+      <h1>Masuk ke Vaulta</h1>
+      <p class="muted">Data keuangan Anda hanya bisa dibuka setelah login.</p>
+      <label class="label" for="loginUser">Username</label>
+      <input type="text" id="loginUser" autocomplete="username" required />
+      <label class="label" for="loginPass">Password</label>
+      <input type="password" id="loginPass" autocomplete="current-password" required />
+      <p class="login-error" id="loginError" role="alert" hidden></p>
+      <button type="submit" class="btn-primary" id="loginBtn">Masuk</button>
+    </form>
+  </div>
+
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <div class="app">
