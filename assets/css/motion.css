@@ -1,18 +1,13 @@
-/* MOTION — hover kartu, scroll reveal, reduced-motion (dimuat terakhir) */
-/* ── Motion: hover card, scroll reveal ── */
-[data-reveal] { transition: opacity var(--t-slow) var(--ease), translate var(--t-slow) var(--ease), transform var(--t) var(--ease), box-shadow var(--t) var(--ease); }
+/* MOTION — reveal halus, hover lembut, reduced-motion (dimuat terakhir) */
+[data-reveal] { transition: opacity var(--t-slow) var(--ease), translate var(--t-slow) var(--ease), transform var(--t) var(--ease); }
 
 @media (hover: hover) {
-  .stat:hover, .info:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0 0 1px var(--sage), 0 0 0 5px rgba(64, 138, 113, 0.14), 0 14px 28px rgba(9, 20, 19, 0.14);
-  }
+  .stat:hover, .info:hover { transform: translateY(-3px); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .motion [data-reveal]:not(.in) { opacity: 0; translate: 0 16px; }
+  .motion [data-reveal]:not(.in) { opacity: 0; translate: 0 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  .skeleton::after { animation: none; }
-  .spinner { animation-duration: 1.5s !important; }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
