@@ -1,19 +1,23 @@
-/* BASE — token (60/40/… → 20% putih · 40% hitam · 40% kuning), reset, brand, splash, tombol, ikon */
+/* BASE — token (Minimalist Monochromatic), reset, brand, splash, tombol, ikon */
 :root {
-  --yellow: #FFD60A;
-  --black: #0E0E10;
-  --white: #FFFFFF;
+  --bg: #F3F2EF;        /* latar kanvas utama */
+  --surface: #FFFFFF;   /* kartu terang, topbar, drawer */
+  --dark: #1E1E1E;       /* sidebar & kartu unggulan (featured) */
+  --fill: #F4F4F4;      /* isian search/pill/badge netral */
 
-  --ink: #0E0E10;                       /* teks di atas kuning/putih */
-  --muted: rgba(14, 14, 16, 0.66);      /* teks redup di atas kuning (≥6:1) */
-  --muted-white: #6B6B70;               /* teks redup di atas putih (5:1) */
-  --muted-dark: rgba(255, 255, 255, 0.62); /* teks redup di atas hitam */
-  --line: rgba(14, 14, 16, 0.14);
+  --ink: #1A1A1A;             /* teks utama di atas permukaan terang */
+  --muted: #7A7A7A;           /* teks redup di atas permukaan terang */
+  --on-dark: #FFFFFF;         /* teks/ikon utama di atas permukaan gelap */
+  --on-dark-muted: #A3A3A3;   /* teks/ikon redup di atas permukaan gelap */
+  --line: #E5E5E5;            /* border & pemisah */
   --line-dark: rgba(255, 255, 255, 0.12);
 
+  --chart-1: #262626; /* seri utama grafik (gelap pekat) */
+  --chart-2: #8E8E8E; /* seri kedua grafik (abu-abu) */
+
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-  --r: 22px;
-  --r-sm: 14px;
+  --r: 20px;
+  --r-sm: 10px;
 
   /* Easing ala Apple: masuk cepat, berhenti lembut. Tanpa overshoot. */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -25,12 +29,12 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { background: var(--yellow); color: var(--ink); font: 1rem/1.55 var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; letter-spacing: -0.011em; }
+body { background: var(--bg); color: var(--ink); font: 1rem/1.55 var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; letter-spacing: -0.011em; font-variant-numeric: tabular-nums; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 3px solid var(--black); outline-offset: 2px; }
-.sidebar :focus-visible, .topbar :focus-visible, .bottom-nav :focus-visible, .stat :focus-visible, .chart-panel :focus-visible { outline-color: var(--yellow); }
+:focus-visible { outline: 3px solid var(--dark); outline-offset: 2px; }
+.sidebar :focus-visible, .bottom-nav :focus-visible { outline-color: var(--surface); }
 
 .mono { font-size: 0.78rem; font-weight: 500; letter-spacing: 0; }
 .muted { color: var(--muted); }
@@ -43,15 +47,15 @@ small { font-size: 0.78rem; display: block; }
 .brand b { letter-spacing: -0.01em; font-size: 1.05rem; font-weight: 600; display: block; line-height: 1.1; }
 .brand small { font-size: 0.7rem; }
 .brand-mobile { display: none; }
+/* Logo (PNG) berupa siluet putih; dibalik agar tetap terlihat di atas topbar yang kini terang */
+.topbar .brand-mobile .logo-img { filter: invert(1); }
 
 /* ── Splash ── */
-.splash { position: fixed; inset: 0; z-index: 1000; background: var(--black); color: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.8s var(--ease-io), visibility 0.8s; }
+.splash { position: fixed; inset: 0; z-index: 1000; background: var(--dark); color: var(--on-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.8s var(--ease-io), visibility 0.8s; }
 .splash .logo-img { animation: breathe 2s var(--ease-io) infinite alternate; }
-.splash .muted { color: var(--muted-dark); }
+.splash .muted { color: var(--on-dark-muted); }
 .splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-.splash-bar { width: 120px; height: 3px; border-radius: 3px; background: var(--line-dark); margin-top: 18px; overflow: hidden; }
-.splash-bar i { display: block; height: 100%; border-radius: 3px; background: var(--yellow); animation: load 2s var(--ease-io) forwards; }
-@keyframes load { from { width: 0; } to { width: 100%; } }
+.splash-spinner { width: 34px; height: 34px; margin-top: 18px; border-radius: 50%; border: 3px solid var(--line-dark); border-top-color: var(--on-dark); animation: spin 0.85s linear infinite; }
 @keyframes breathe { from { opacity: 0.75; scale: 0.97; } to { opacity: 1; scale: 1; } }
 
 /* ── Layout ── */
@@ -59,21 +63,22 @@ small { font-size: 0.78rem; display: block; }
 .main { flex: 1; min-width: 0; }
 
 /* ── Buttons ── */
-.btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: var(--black); color: var(--yellow); border-radius: 9999px; font-weight: 600;
+.btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: var(--dark); color: var(--on-dark); border-radius: 9999px; font-weight: 600;
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), scale var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease); }
-.btn-primary:hover { background: #2a2a2e; }
-.btn-ghost { display: inline-flex; gap: 6px; align-items: center; padding: 8px 16px; border: 1px solid var(--line-dark); border-radius: 9999px; font-size: 0.85rem; color: var(--white);
+.btn-primary:hover { background: #333336; }
+.btn-ghost { display: inline-flex; gap: 6px; align-items: center; padding: 8px 16px; border: 1px solid var(--line); border-radius: 9999px; font-size: 0.85rem; color: var(--ink);
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), scale var(--t-fast) var(--ease); }
-.btn-ghost:hover { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+.btn-ghost:hover { background: var(--dark); border-color: var(--dark); color: var(--on-dark); }
 .btn-primary:active, .btn-ghost:active, .pill:active { scale: 0.97; transition-duration: 100ms; }
 .btn-primary:disabled { opacity: 0.6; cursor: wait; }
 #btnText { display: inline-flex; align-items: center; gap: 8px; }
-.spinner { width: 14px; height: 14px; border: 2px solid rgba(255, 214, 10, 0.3); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: var(--on-dark); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Ikon SVG: siluet satu warna. Default gelap; putih jika di atas hitam. ── */
+/* ── Ikon SVG: siluet satu warna. Gelap di atas terang; putih di atas gelap. ── */
 .ic { width: 1.15em; height: 1.15em; vertical-align: -0.2em; flex: none; object-fit: contain; filter: brightness(0); transition: filter var(--t-fast) var(--ease); }
-.sidebar .nav-item:not(.active) .ic, .sidebar .sync-row .ic, .bottom-nav .ic, .panel-dark .panel-head .ic { filter: brightness(0) invert(1); }
+.sidebar .nav-item:not(.active) .ic, .sidebar .sync-row .ic, .bottom-nav .nav-item:not(.active) .ic { filter: brightness(0) invert(1); }
+.stat-featured .ic { filter: brightness(0) invert(1); }
 .stat-ic .ic, .hi-icon .ic { width: 18px; height: 18px; vertical-align: 0; }
 .sync-name { display: inline-flex; align-items: center; gap: 8px; }
 .nav-item .ic { width: 18px; height: 18px; vertical-align: 0; }
