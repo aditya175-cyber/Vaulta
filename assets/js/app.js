@@ -44,6 +44,18 @@
     $$('.nav-item[data-page]').forEach((b) => b.addEventListener('click', () => navigateTo(b.dataset.page)));
     $$('.js-new').forEach((b) => b.addEventListener('click', newEntry));
     $$('.js-history').forEach((b) => b.addEventListener('click', () => navigateTo('history')));
+    $('#btnCloseEntry').addEventListener('click', entryModal.close);
+    $('#btnProfile').addEventListener('click', (e) => { $('#profileName').value = localStorage.getItem('vaulta_user') || ''; profileModal.open(e.currentTarget); });
+    $('#btnCloseProfile').addEventListener('click', profileModal.close);
+    $('#profileForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = $('#profileName').value.trim();
+      if (!name) return;
+      localStorage.setItem('vaulta_user', name);
+      setUser();
+      profileModal.close();
+      showToast('success', 'Tersimpan!', 'Nama tampilan diperbarui.');
+    });
     $$('.filter button').forEach((b) => b.addEventListener('click', () => {
       filter = b.dataset.filter;
       $$('.filter button').forEach((x) => x.classList.toggle('active', x.dataset.filter === filter));
@@ -86,6 +98,7 @@
     const name = localStorage.getItem('vaulta_user') || 'User';
     $('#userName').textContent = name;
     $('#userAvatar').textContent = name.charAt(0).toUpperCase();
+    $('#pageTitle').textContent = `Halo, ${name}! 👋`;
   }
 
   function logout() {
@@ -139,10 +152,34 @@
     window.scrollTo(0, 0);
   }
 
-  function newEntry() {
-    navigateTo('dashboard');
-    $('#quickInput').scrollIntoView({ block: 'start' });
-    inputJumlah.focus({ preventScroll: true });
+  /* ── Modal (generik): overlay + dialog, dipakai oleh Input Cepat & Profil ── */
+  function createModal(el, focusEl) {
+    let trigger = null; // tombol pemicu, agar fokus bisa dikembalikan saat ditutup
+    const onKeydown = (e) => { if (e.key === 'Escape') close(); };
+
+    function open(t) {
+      trigger = t || null;
+      el.hidden = false;
+      requestAnimationFrame(() => el.classList.add('open'));
+      focusEl?.focus({ preventScroll: true });
+      document.addEventListener('keydown', onKeydown);
+    }
+    function close() {
+      el.classList.remove('open');
+      document.removeEventListener('keydown', onKeydown);
+      setTimeout(() => { el.hidden = true; }, 250); // selaras durasi transisi CSS
+      trigger?.focus();
+    }
+    el.addEventListener('click', (e) => { if (e.target === el) close(); });
+    return { open, close };
+  }
+
+  const entryModal = createModal($('#entryModal'), inputJumlah);
+  const profileModal = createModal($('#profileModal'), $('#profileName'));
+
+  function newEntry(e) {
+    if (!localStorage.getItem('vaulta_token')) return; // belum masuk, tidak ada yang bisa dicatat
+    entryModal.open(e?.currentTarget);
   }
 
   /* ── Kategori ── */
@@ -202,6 +239,7 @@
       renderPills(); // juga mengosongkan kategori
       inputJumlah.value = '';
       inputKeterangan.value = '';
+      entryModal.close();
       setTimeout(loadChart, 1500); // beri waktu Apps Script menulis baris baru
     } catch (err) {
       renderHistory(); // buang skeleton
@@ -262,11 +300,12 @@
       }
 
       const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-      const yellow = css('--yellow');
-      const white = css('--white');
-      const black = css('--black');
+      const chart1 = css('--chart-1'); // seri utama: Pemasukan
+      const chart2 = css('--chart-2'); // seri kedua: Pengeluaran
+      const dark = css('--dark');
+      const onDark = css('--on-dark');
       Chart.defaults.font.family = css('--font');
-      Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+      Chart.defaults.color = css('--muted');
 
       financeChart = new Chart($('#financeChart').getContext('2d'), {
         type: 'line',
@@ -276,24 +315,24 @@
             {
               label: 'Pemasukan',
               data: c.pemasukan,
-              borderColor: yellow,
-              backgroundColor: 'rgba(255, 214, 10, 0.14)',
+              borderColor: chart1,
+              backgroundColor: 'rgba(38, 38, 38, 0.08)',
               fill: true,
               tension: 0.4, // kurva halus
               pointRadius: 4,
-              pointBackgroundColor: yellow,
+              pointBackgroundColor: chart1,
             },
             {
               label: 'Pengeluaran',
               data: c.pengeluaran,
-              borderColor: white,
+              borderColor: chart2,
               borderDash: [6, 4], // garis putus-putus: tidak bergantung pada warna saja
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: 'rgba(142, 142, 142, 0.08)',
               fill: true,
               tension: 0.4,
               pointRadius: 4,
               pointStyle: 'rectRot',
-              pointBackgroundColor: white,
+              pointBackgroundColor: chart2,
             },
           ],
         },
@@ -304,13 +343,13 @@
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { position: 'top', labels: { font: { size: 12, weight: '500' } } },
-            tooltip: { backgroundColor: yellow, titleColor: black, bodyColor: black, cornerRadius: 12, padding: 10, callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatRupiah(Math.round(ctx.parsed.y))}` } },
+            tooltip: { backgroundColor: dark, titleColor: onDark, bodyColor: onDark, cornerRadius: 12, padding: 10, callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatRupiah(Math.round(ctx.parsed.y))}` } },
           },
           scales: {
             x: { grid: { display: false } }, // tanpa garis grid vertikal
             y: {
               beginAtZero: true,
-              grid: { color: 'rgba(255, 255, 255, 0.1)' }, border: { display: false },
+              grid: { color: css('--line') }, border: { display: false },
               ticks: { callback: (value) => 'Rp ' + Number(value).toLocaleString('id-ID') },
             },
           },
