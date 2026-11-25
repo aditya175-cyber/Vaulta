@@ -13,10 +13,42 @@
   <div class="topbar-right">
     <span class="status mono muted">Status<br /><b id="netStatus">Online</b></span>
     <button class="btn-ghost" id="btnExport" type="button">⇩ <span class="hide-sm">Ekspor CSV</span></button>
-    <div class="user">
+    <button class="user" id="btnProfile" type="button" aria-haspopup="dialog">
       <span class="avatar" id="userAvatar">U</span>
       <span class="user-info hide-sm"><b id="userName">User</b><small class="mono muted">Pengguna</small></span>
-    </div>
-    <button class="btn-ghost" id="btnLogout" type="button">Keluar</button>
+    </button>
   </div>
 </header>
+
+<!-- ═══ MODAL: Profil ═══ -->
+<div class="modal-overlay" id="profileModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+    <div class="modal-head">
+      <h2 id="profileModalTitle">Profil</h2>
+      <button type="button" class="modal-close js-modal-close" id="btnCloseProfile" aria-label="Tutup">✕</button>
+    </div>
+
+    <div class="profile-photo-row">
+      <button type="button" class="profile-avatar-btn" id="btnChangePhoto" aria-label="Ganti foto profil">
+        <span class="avatar avatar-lg" id="profileAvatarPreview">U</span>
+      </button>
+      <div class="profile-photo-actions">
+        <button type="button" class="link mono" id="btnUploadPhoto">Ganti Foto</button>
+        <button type="button" class="link mono" id="btnRemovePhoto" hidden>Hapus Foto</button>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" hidden />
+    </div>
+
+    <form id="profileForm" autocomplete="off" class="form">
+      <div class="field">
+        <label class="label mono" for="profileName">Nama Tampilan</label>
+        <input type="text" id="profileName" placeholder="Nama Anda" required maxlength="40" />
+        <small class="muted">Foto dan nama hanya tampil di perangkat ini, bukan username untuk masuk.</small>
+      </div>
+      <button type="submit" class="btn-primary" id="btnSaveProfile">Simpan Perubahan</button>
+    </form>
+
+    <div class="modal-divider"></div>
+    <button type="button" class="btn-ghost btn-block" id="btnLogout">Keluar</button>
+  </div>
+</div>
