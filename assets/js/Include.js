@@ -1,6 +1,16 @@
 /* Memuat components/*.html ke index.html, lalu menjalankan app.js & motion.js.
-   Butuh server lokal (mis. Live Server) — fetch tidak jalan di file:// */
+   Butuh server HTTP (Live Server, GitHub Pages, dst) — fetch tidak jalan di file://
+   Splash TIDAK PERNAH macet: apa pun yang gagal, tetap tertutup paling lama beberapa detik. */
 (async function () {
+  // jaring pengaman: dibiarkan jalan terus, tidak pernah dibatalkan — hideSplash() aman dipanggil berkali-kali
+  setTimeout(() => document.getElementById('splashScreen')?.classList.add('hidden'), 6000);
+
+  const warn = (msg) => {
+    console.error(msg);
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div style="position:fixed;z-index:2000;left:0;right:0;top:0;padding:10px 16px;background:#fff3cd;color:#000;font:13px/1.4 sans-serif">⚠ ' + msg + '</div>');
+  };
+
   const slots = [...document.querySelectorAll('[data-include]')];
   try {
     const parts = await Promise.all(slots.map(async (el) => {
@@ -10,17 +20,20 @@
     }));
     slots.forEach((el, i) => { el.insertAdjacentHTML('afterend', parts[i]); el.remove(); });
   } catch (err) {
-    console.error('Gagal memuat komponen:', err);
-    document.body.insertAdjacentHTML('afterbegin',
-      '<p style="padding:24px;font:16px sans-serif">Komponen gagal dimuat. Buka lewat server lokal (mis. ekstensi Live Server), bukan klik dua kali index.html.</p>');
-    document.getElementById('splashScreen')?.remove();
+    warn('Komponen gagal dimuat (' + err.message + '). Jika ini di GitHub Pages, pastikan semua folder/file (termasuk huruf besar-kecilnya) sudah ter-push.');
+    document.getElementById('splashScreen')?.classList.add('hidden');
     return;
   }
+
   for (const src of ['assets/js/app.js', 'assets/js/motion.js']) {
-    await new Promise((ok, no) => {
-      const s = document.createElement('script');
-      s.src = src; s.onload = ok; s.onerror = () => no(new Error(src));
-      document.body.append(s);
-    });
+    try {
+      await new Promise((ok, no) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = ok; s.onerror = () => no(new Error(src));
+        document.body.append(s);
+      });
+    } catch (err) {
+      warn('File tidak ditemukan: ' + err.message + '. Cek nama file (huruf besar-kecil) dan apakah sudah ter-push ke GitHub.');
+    }
   }
 })();
