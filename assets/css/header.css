@@ -14,7 +14,8 @@
 .user { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 16px; margin: -6px 0; border-left: 1px solid var(--line); border-radius: 9999px;
   transition: background-color var(--t-fast) var(--ease); }
 .user:hover { background: var(--fill); }
-.avatar { display: grid; place-items: center; width: 32px; height: 32px; background: var(--dark); color: var(--on-dark); border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex: none; }
+.avatar { display: grid; place-items: center; width: 32px; height: 32px; background: var(--dark); color: var(--on-dark); border-radius: 50%; font-weight: 700; font-size: 0.8rem; flex: none;
+  background-size: cover; background-position: center; } /* background-image diisi lewat JS jika ada foto profil */
 .user-info { text-align: left; }
 .user-info b { font-size: 0.85rem; display: block; line-height: 1.2; font-weight: 600; }
 
