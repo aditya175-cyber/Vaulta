@@ -94,17 +94,27 @@
     $('#loginUser').focus();
   }
 
+  // Menata satu bulatan avatar: foto (jika ada) atau huruf awal nama
+  function applyAvatar(el, name, photo) {
+    el.style.backgroundImage = photo ? `url(${photo})` : '';
+    el.textContent = photo ? '' : name.charAt(0).toUpperCase();
+  }
+
   function setUser() {
     const name = localStorage.getItem('vaulta_user') || 'User';
+    const photo = localStorage.getItem('vaulta_photo') || '';
     $('#userName').textContent = name;
-    $('#userAvatar').textContent = name.charAt(0).toUpperCase();
     $('#pageTitle').textContent = `Halo, ${name}! 👋`;
+    applyAvatar($('#userAvatar'), name, photo);
+    applyAvatar($('#profileAvatarPreview'), name, photo);
+    $('#btnRemovePhoto').hidden = !photo;
   }
 
   function logout() {
     window.api('logout').catch(() => {}); // token dibuang di sisi browser apa pun hasilnya
     localStorage.removeItem('vaulta_token');
     localStorage.removeItem('vaulta_user');
+    localStorage.removeItem('vaulta_photo'); // perangkat bisa dipakai bergantian, jangan sisakan foto akun sebelumnya
     sessionStorage.removeItem('vaulta_session'); // jangan sisakan data akun sebelumnya
     entries = [];
     searchInput.value = '';
@@ -113,8 +123,51 @@
     showLogin();
   }
 
+  // Memampatkan foto ke bujur sangkar kecil agar aman untuk localStorage (foto kamera HP bisa berukuran puluhan MB)
+  function resizePhoto(file) {
+    return new Promise((resolve, reject) => {
+      if (!file.type.startsWith('image/')) return reject(new Error('File harus berupa gambar.'));
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const SIZE = 160;
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        const canvas = document.createElement('canvas');
+        canvas.width = SIZE; canvas.height = SIZE;
+        canvas.getContext('2d').drawImage(
+          img,
+          (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, // crop tengah jadi persegi
+          0, 0, SIZE, SIZE
+        );
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Gambar tidak bisa dibaca.')); };
+      img.src = url;
+    });
+  }
+
   function bindAuth() {
-    $('#btnLogout').addEventListener('click', logout);
+    $('#btnLogout').addEventListener('click', () => { profileModal.close(); logout(); });
+    $('#btnChangePhoto').addEventListener('click', () => $('#photoInput').click());
+    $('#btnUploadPhoto').addEventListener('click', () => $('#photoInput').click());
+    $('#btnRemovePhoto').addEventListener('click', () => {
+      localStorage.removeItem('vaulta_photo');
+      setUser();
+      showToast('success', 'Terhapus', 'Foto profil dihapus.');
+    });
+    $('#photoInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      e.target.value = ''; // agar memilih file yang sama lagi tetap memicu 'change'
+      if (!file) return;
+      try {
+        localStorage.setItem('vaulta_photo', await resizePhoto(file));
+        setUser();
+        showToast('success', 'Tersimpan!', 'Foto profil diperbarui.');
+      } catch (err) {
+        showToast('error', 'Gagal', err.message || 'Foto tidak bisa disimpan.');
+      }
+    });
     document.addEventListener('vaulta:logout', () => {
       localStorage.removeItem('vaulta_token');
       showLogin();
